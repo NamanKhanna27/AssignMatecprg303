@@ -4,14 +4,16 @@ import { auth, db } from "../../../services/firebase/firebase";
 import { doc, getDoc, collection, onSnapshot } from "firebase/firestore";
 
 export default function HomeScreen({ navigation }) {
-  const [userName, setUserName] = useState("User");
-  const [progressPercent, setProgressPercent] = useState(0);
+  const [userName, setUserName] = useState("User"); // displayed name
+  const [progressPercent, setProgressPercent] = useState(0); // progress bar %
 
   useEffect(() => {
     const loadUser = async () => {
       try {
         const ref = doc(db, "users", auth.currentUser.uid);
         const snap = await getDoc(ref);
+
+        // load user full name
         if (snap.exists()) {
           setUserName(snap.data().fullName || "User");
         }
@@ -24,6 +26,7 @@ export default function HomeScreen({ navigation }) {
   }, []);
 
   useEffect(() => {
+    // listen to assignment changes in real time
     const ref = collection(db, "users", auth.currentUser.uid, "assignments");
 
     const unsubscribe = onSnapshot(ref, (snapshot) => {
@@ -32,11 +35,12 @@ export default function HomeScreen({ navigation }) {
       const total = list.length;
       const completed = list.filter((a) => a.status === "completed").length;
 
+      // calculate progress %
       const progress = total === 0 ? 0 : (completed / total) * 100;
       setProgressPercent(progress);
     });
 
-    return unsubscribe;
+    return unsubscribe; // cleanup listener
   }, []);
 
   return (
@@ -44,6 +48,7 @@ export default function HomeScreen({ navigation }) {
       <Text style={styles.greeting}>Hello, {userName} 👋</Text>
       <Text style={styles.subtitle}>Welcome back to AssignMate</Text>
 
+      {/* card showing today's info and progress */}
       <View style={styles.infoCard}>
         <Text style={styles.infoTitle}>Today</Text>
 
@@ -53,6 +58,7 @@ export default function HomeScreen({ navigation }) {
           Stay on track! You've got this 💪
         </Text>
 
+        {/* progress bar */}
         <View style={styles.progressBarContainer}>
           <View
             style={[
@@ -67,6 +73,7 @@ export default function HomeScreen({ navigation }) {
         </Text>
       </View>
 
+      {/* navigation buttons */}
       <TouchableOpacity
         style={styles.mainButton}
         onPress={() => navigation.navigate("Assignments")}
@@ -99,7 +106,6 @@ const styles = StyleSheet.create({
     padding: 24,
     backgroundColor: "#fff",
   },
-
 
   greeting: {
     fontSize: 28,

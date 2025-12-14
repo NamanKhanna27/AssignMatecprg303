@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Dimensions } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { ProgressChart } from "react-native-chart-kit";
 import { collection, onSnapshot } from "firebase/firestore";
 import { auth, db } from "../../../services/firebase/firebase";
@@ -18,15 +18,17 @@ const QUOTES = [
 ];
 
 export default function ProgressScreen() {
-  const [assignments, setAssignments] = useState([]);
-  const [quote, setQuote] = useState("");
+  const [assignments, setAssignments] = useState([]); // all assignments
+  const [quote, setQuote] = useState(""); // random quote
 
   useEffect(() => {
+    // pick a random quote once
     const random = QUOTES[Math.floor(Math.random() * QUOTES.length)];
     setQuote(random);
   }, []);
 
   useEffect(() => {
+    // real-time listener on user assignments
     const ref = collection(db, "users", auth.currentUser.uid, "assignments");
 
     const unsubscribe = onSnapshot(ref, (snapshot) => {
@@ -37,21 +39,22 @@ export default function ProgressScreen() {
       setAssignments(list);
     });
 
-    return unsubscribe;
+    return unsubscribe; // cleanup listener
   }, []);
 
   const total = assignments.length;
   const completed = assignments.filter((a) => a.status === "completed").length;
   const pending = total - completed;
 
-  const progress = total === 0 ? 0 : completed / total;
-  const progressPercent = Math.round(progress * 100);
+  const progress = total === 0 ? 0 : completed / total; // 0–1
+  const progressPercent = Math.round(progress * 100); // show full % number
 
   const chartData = {
     labels: [],
     data: [progress],
   };
 
+  // sort upcoming assignments by due date
   const upcoming = [...assignments]
     .filter((a) => a.dueDate?.toDate)
     .sort((a, b) => a.dueDate.toDate() - b.dueDate.toDate())
@@ -61,6 +64,7 @@ export default function ProgressScreen() {
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Your Progress</Text>
 
+      {/* progress circle */}
       <View style={{ alignItems: "center", marginBottom: 5 }}>
         <ProgressChart
           data={chartData}
@@ -80,10 +84,12 @@ export default function ProgressScreen() {
         <Text style={styles.percentText}>{progressPercent}% Completed</Text>
       </View>
 
+      {/* quote */}
       <View style={styles.quoteBox}>
         <Text style={styles.quoteText}>“{quote}”</Text>
       </View>
 
+      {/* stats row */}
       <View style={styles.statsRow}>
         <View style={styles.statBox}>
           <Text style={styles.statNum}>{total}</Text>
@@ -101,6 +107,7 @@ export default function ProgressScreen() {
         </View>
       </View>
 
+      {/* upcoming deadlines */}
       <View style={styles.box}>
         <Text style={styles.boxTitle}>Upcoming Deadlines</Text>
 
@@ -142,12 +149,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 26,
     fontWeight: "700",
-    marginTop: 0,
     marginBottom: 10,
     color: "#333",
   },
 
-  // QUOTE UI
+  // quote styles
   quoteBox: {
     paddingVertical: 12,
     paddingHorizontal: 16,

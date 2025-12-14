@@ -12,16 +12,20 @@ export default function ProfileStack({ setIsLoggedIn }) {
         headerTitleAlign: "center",
       }}
     >
+      {/* main profile screen */}
       <Stack.Screen
         name="ProfileMain"
         options={({ navigation }) => ({
           title: "Profile",
-          headerLeft: () => <BackButton navigation={navigation} />,
+          headerLeft: () => <BackButton navigation={navigation} />, // custom back button
         })}
       >
-        {(props) => <ProfileScreen {...props} setIsLoggedIn={setIsLoggedIn} />}
+        {(props) => (
+          <ProfileScreen {...props} setIsLoggedIn={setIsLoggedIn} />
+        )}
       </Stack.Screen>
 
+      {/* edit profile screen */}
       <Stack.Screen
         name="EditProfile"
         component={EditProfileScreen}

@@ -8,10 +8,11 @@ export default function ProgressStack({ navigation }) {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerLeft: () => <BackButton navigation={navigation} />,
+        headerLeft: () => <BackButton navigation={navigation} />, // custom back button
         headerTitleAlign: "center",
       }}
     >
+      {/* main progress screen */}
       <Stack.Screen
         name="ProgressMain"
         component={ProgressScreen}

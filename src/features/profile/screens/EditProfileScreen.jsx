@@ -24,6 +24,7 @@ export default function EditProfileScreen({ navigation }) {
   useEffect(() => {
     const load = async () => {
       try {
+        // load existing user data from Firestore
         const ref = doc(db, "users", auth.currentUser.uid);
         const snap = await getDoc(ref);
 
@@ -47,10 +48,12 @@ export default function EditProfileScreen({ navigation }) {
       const uid = auth.currentUser.uid;
       const userRef = doc(db, "users", uid);
 
+      // update email in Firebase Auth if changed
       if (email.trim() !== initialEmail.trim()) {
         await updateEmail(auth.currentUser, email.trim());
       }
 
+      // update Firestore profile fields
       await updateDoc(userRef, {
         fullName: fullName.trim(),
         email: email.trim(),
@@ -66,6 +69,7 @@ export default function EditProfileScreen({ navigation }) {
       navigation.goBack();
     } catch (err) {
       console.log("SAVE ERROR:", err);
+
       showDialog({
         title: "Update Failed",
         message:
@@ -87,6 +91,7 @@ export default function EditProfileScreen({ navigation }) {
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Edit Profile</Text>
 
+      {/* name */}
       <Text style={styles.label}>Full Name</Text>
       <TextInput
         value={fullName}
@@ -95,6 +100,7 @@ export default function EditProfileScreen({ navigation }) {
         placeholder="Enter full name"
       />
 
+      {/* email */}
       <Text style={styles.label}>Email</Text>
       <TextInput
         value={email}
@@ -105,6 +111,7 @@ export default function EditProfileScreen({ navigation }) {
         placeholder="Enter new email"
       />
 
+      {/* bio */}
       <Text style={styles.label}>Bio</Text>
       <TextInput
         value={bio}
@@ -114,19 +121,15 @@ export default function EditProfileScreen({ navigation }) {
         placeholder="Write something about yourself..."
       />
 
+      {/* info tips */}
       <View style={styles.infoCard}>
         <Text style={styles.infoTitle}>Profile Tips</Text>
-        <Text style={styles.infoText}>
-          • Adding a bio helps personalize your profile.
-        </Text>
-        <Text style={styles.infoText}>
-          • Your email is used for account login and notifications.
-        </Text>
-        <Text style={styles.infoText}>
-          • Your name is visible throughout the app.
-        </Text>
+        <Text style={styles.infoText}>• Adding a bio helps personalize your profile.</Text>
+        <Text style={styles.infoText}>• Your email is used for account login and notifications.</Text>
+        <Text style={styles.infoText}>• Your name is visible throughout the app.</Text>
       </View>
 
+      {/* save button */}
       <TouchableOpacity style={styles.btn} onPress={saveChanges}>
         <Text style={styles.btnText}>Save Changes</Text>
       </TouchableOpacity>

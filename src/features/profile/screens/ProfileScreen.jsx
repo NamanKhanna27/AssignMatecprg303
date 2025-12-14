@@ -13,6 +13,7 @@ import { auth, db } from "../../../services/firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { useAppDialog } from "../../../shared/components/AppDialog/AppDialogContext";
 
+// converts stored date string → readable format
 function formatJoinDate(dateString) {
   try {
     const date = new Date(dateString);
@@ -25,11 +26,12 @@ function formatJoinDate(dateString) {
 export default function ProfileScreen({ navigation }) {
   const { showDialog } = useAppDialog();
 
-  const [userData, setUserData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [userData, setUserData] = useState(null); // firestore user data
+  const [loading, setLoading] = useState(true);   // loading state
 
   const loadUser = async () => {
     try {
+      // reference to Firestore user document
       const ref = doc(db, "users", auth.currentUser.uid);
       const snap = await getDoc(ref);
 
@@ -47,14 +49,16 @@ export default function ProfileScreen({ navigation }) {
   };
 
   useEffect(() => {
-    loadUser();
+    loadUser(); // load once when screen mounts
+
+    // reload when screen refocuses
     const unsubscribe = navigation.addListener("focus", loadUser);
     return unsubscribe;
   }, [navigation]);
 
   const handleLogout = async () => {
     try {
-      await auth.signOut();
+      await auth.signOut(); // Firebase logout
     } catch (e) {
       showDialog({
         title: "Logout failed",
@@ -64,6 +68,7 @@ export default function ProfileScreen({ navigation }) {
     }
   };
 
+  // loading state or missing data
   if (loading || !userData) {
     return (
       <View style={styles.loadingContainer}>
@@ -77,17 +82,17 @@ export default function ProfileScreen({ navigation }) {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Avatar */}
+      {/* avatar */}
       <Image
         source={{ uri: "https://i.pravatar.cc/300" }}
         style={styles.avatar}
       />
 
-      {/* Info */}
+      {/* user info */}
       <Text style={styles.name}>{userData.fullName}</Text>
       <Text style={styles.email}>{userData.email}</Text>
 
-      {/* Buttons */}
+      {/* buttons */}
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate("EditProfile")}
@@ -102,17 +107,17 @@ export default function ProfileScreen({ navigation }) {
         <Text style={[styles.buttonText, styles.logoutText]}>Logout</Text>
       </TouchableOpacity>
 
-      {/* Info Card */}
+      {/* info card */}
       <View style={styles.infoCard}>
         <Text style={styles.sectionTitle}>About You</Text>
 
-        {/* Bio */}
+        {/* bio */}
         <Text style={styles.label}>Bio</Text>
         <Text style={styles.value}>
           {userData.bio?.trim() ? userData.bio : "No bio added yet."}
         </Text>
 
-        {/* Join Date */}
+        {/* join date */}
         <Text style={[styles.label, { marginTop: 12 }]}>Joined App</Text>
         <Text style={styles.value}>{joinedDate}</Text>
       </View>
