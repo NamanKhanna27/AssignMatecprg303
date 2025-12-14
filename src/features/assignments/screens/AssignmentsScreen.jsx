@@ -6,6 +6,7 @@ import { auth } from "../../../services/firebase/firebase";
 import { listenAssignments, toggleAssignmentStatus, deleteAssignment } from "../services/assignmentService";
 import { useAppDialog } from "../../../shared/components/AppDialog/AppDialogContext";
 
+// formats Firestore timestamp → YYYY-MM-DD
 function formatDue(dateValue) {
   try {
     const d = dateValue?.toDate ? dateValue.toDate() : null;
@@ -22,11 +23,11 @@ function formatDue(dateValue) {
 export default function AssignmentsScreen() {
   const uid = auth.currentUser?.uid;
 
-  const [assignments, setAssignments] = useState([]);
+  const [assignments, setAssignments] = useState([]); // stored assignment list
   const [loading, setLoading] = useState(true);
   const { showDialog, showConfirm } = useAppDialog();
 
-  const canUseFirestore = useMemo(() => !!uid, [uid]);
+  const canUseFirestore = useMemo(() => !!uid, [uid]); // ensures uid exists
 
   useEffect(() => {
     if (!canUseFirestore) {
@@ -37,6 +38,7 @@ export default function AssignmentsScreen() {
 
     setLoading(true);
 
+    // real-time listener
     const unsub = listenAssignments(
       uid,
       (items) => {
@@ -45,26 +47,35 @@ export default function AssignmentsScreen() {
       },
       (err) => {
         setLoading(false);
-        showDialog({ title: "Error", message: err?.message ?? "Failed to load assignments.", variant: "error" });
+        showDialog({
+          title: "Error",
+          message: err?.message ?? "Failed to load assignments.",
+          variant: "error"
+        });
       }
     );
 
-    return unsub;
+    return unsub; // cleanup listener
   }, [canUseFirestore, uid]);
 
   const onToggleStatus = async (item) => {
     if (!uid) return;
 
     try {
-      await toggleAssignmentStatus(uid, item.id, item.status);
+      await toggleAssignmentStatus(uid, item.id, item.status); // toggle status
     } catch (e) {
-      showDialog({ title: "Error", message: e?.message ?? "Failed to update status.", variant: "error" });
+      showDialog({
+        title: "Error",
+        message: e?.message ?? "Failed to update status.",
+        variant: "error"
+      });
     }
   };
 
   const onDelete = async (item) => {
     if (!uid) return;
 
+    // confirmation dialog
     showConfirm({
       title: "Delete assignment?",
       message: item.title,
@@ -85,6 +96,7 @@ export default function AssignmentsScreen() {
     });
   };
 
+  // renders each assignment card
   const renderItem = ({ item }) => {
     const completed = item.status === "completed";
 

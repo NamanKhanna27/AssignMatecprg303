@@ -8,15 +8,16 @@ export default function AssignmentsStack() {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerTitleAlign: "center",
+        headerTitleAlign: "center", // center title
       }}
     >
+      {/* main assignments list screen */}
       <Stack.Screen
         name="AssignmentsMain"
         component={AssignmentsScreen}
         options={({ navigation }) => ({
           title: "Assignments",
-          headerLeft: () => <BackButton navigation={navigation} />,
+          headerLeft: () => <BackButton navigation={navigation} />, // custom back button
         })}
       />
     </Stack.Navigator>

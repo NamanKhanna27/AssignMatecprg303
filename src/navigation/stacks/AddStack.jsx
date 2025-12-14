@@ -8,15 +8,16 @@ export default function AddStack() {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerTitleAlign: "center",
+        headerTitleAlign: "center", // center header title
       }}
     >
+      {/* add assignment screen */}
       <Stack.Screen
         name="AddAssignmentMain"
         component={AddAssignmentScreen}
         options={({ navigation }) => ({
           title: "Add Assignment",
-          headerLeft: () => <BackButton navigation={navigation} />,
+          headerLeft: () => <BackButton navigation={navigation} />, // custom back button
         })}
       />
     </Stack.Navigator>

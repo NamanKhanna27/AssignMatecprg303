@@ -23,16 +23,16 @@ export default function AddAssignmentScreen() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
-  const [dueDate, setDueDate] = useState(new Date());
-  const [priority, setPriority] = useState("Medium");
+  const [dueDate, setDueDate] = useState(new Date()); // stores selected due date
+  const [priority, setPriority] = useState("Medium"); // selected priority
 
   const [loading, setLoading] = useState(false);
 
-  const [calendarVisible, setCalendarVisible] = useState(false);
+  const [calendarVisible, setCalendarVisible] = useState(false); // date picker modal
   const [month, setMonth] = useState(dueDate.getMonth());
   const [year, setYear] = useState(dueDate.getFullYear());
 
-  const [showPriorityModal, setShowPriorityModal] = useState(false);
+  const [showPriorityModal, setShowPriorityModal] = useState(false); // priority modal
 
   const formatDate = (date) => {
     const yyyy = date.getFullYear();
@@ -41,6 +41,7 @@ export default function AddAssignmentScreen() {
     return `${yyyy}-${mm}-${dd}`;
   };
 
+  // calendar helpers
   const daysInMonth = (m, y) => new Date(y, m + 1, 0).getDate();
   const firstDayOfMonth = (m, y) => new Date(y, m, 1).getDay();
 
@@ -50,6 +51,7 @@ export default function AddAssignmentScreen() {
     setCalendarVisible(false);
   };
 
+  // calendar navigation
   const nextMonth = () => {
     if (month === 11) {
       setMonth(0);
@@ -73,6 +75,7 @@ export default function AddAssignmentScreen() {
         variant: "error",
       });
 
+    // validate title
     const err = validateAssignmentTitle(title);
     if (err)
       return showDialog({
@@ -83,6 +86,8 @@ export default function AddAssignmentScreen() {
 
     try {
       setLoading(true);
+
+      // save assignment
       await addAssignment(uid, {
         title,
         description,
@@ -96,6 +101,7 @@ export default function AddAssignmentScreen() {
         variant: "success",
       });
 
+      // reset fields
       setTitle("");
       setDescription("");
       setDueDate(new Date());
@@ -115,6 +121,7 @@ export default function AddAssignmentScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Add Assignment</Text>
 
+      {/* title input */}
       <TextInput
         style={styles.input}
         placeholder="Assignment Title"
@@ -123,6 +130,7 @@ export default function AddAssignmentScreen() {
         onChangeText={setTitle}
       />
 
+      {/* description input */}
       <TextInput
         style={[styles.input, { height: 70 }]}
         placeholder="Description"
@@ -132,6 +140,7 @@ export default function AddAssignmentScreen() {
         multiline
       />
 
+      {/* due date field */}
       <Text style={styles.label}>Due Date *</Text>
 
       <TouchableOpacity
@@ -141,28 +150,31 @@ export default function AddAssignmentScreen() {
         <Text style={styles.selectText}>{formatDate(dueDate)}</Text>
       </TouchableOpacity>
 
+      {/* calendar modal */}
       <Modal visible={calendarVisible} transparent animationType="fade">
         <Pressable
           style={styles.modalOverlay}
           onPress={() => setCalendarVisible(false)}
         >
           <Pressable style={styles.calendarCard} onPress={() => { }}>
-
             <View style={styles.calendarHeader}>
               <TouchableOpacity onPress={prevMonth}>
                 <Text style={styles.arrow}>{"<"}</Text>
               </TouchableOpacity>
+
               <Text style={styles.monthLabel}>
                 {new Date(year, month).toLocaleString("default", {
                   month: "long",
                 })}{" "}
                 {year}
               </Text>
+
               <TouchableOpacity onPress={nextMonth}>
                 <Text style={styles.arrow}>{">"}</Text>
               </TouchableOpacity>
             </View>
 
+            {/* week days */}
             <View style={styles.weekRow}>
               {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((d) => (
                 <Text key={d} style={styles.weekLabel}>
@@ -171,6 +183,7 @@ export default function AddAssignmentScreen() {
               ))}
             </View>
 
+            {/* days */}
             <View style={styles.daysGrid}>
               {Array(firstDayOfMonth(month, year))
                 .fill(null)
@@ -204,6 +217,7 @@ export default function AddAssignmentScreen() {
         </Pressable>
       </Modal>
 
+      {/* priority field */}
       <Text style={styles.label}>Priority *</Text>
 
       <TouchableOpacity
@@ -213,6 +227,7 @@ export default function AddAssignmentScreen() {
         <Text style={styles.selectText}>{priority}</Text>
       </TouchableOpacity>
 
+      {/* priority modal */}
       <Modal visible={showPriorityModal} transparent animationType="fade">
         <Pressable
           style={styles.modalOverlay}
@@ -254,6 +269,7 @@ export default function AddAssignmentScreen() {
         </Pressable>
       </Modal>
 
+      {/* add button */}
       <TouchableOpacity
         style={[styles.addButton, loading && { opacity: 0.6 }]}
         onPress={handleAddAssignment}
@@ -382,4 +398,3 @@ const styles = StyleSheet.create({
   },
   closeText: { color: "#fff", fontWeight: "700" },
 });
-

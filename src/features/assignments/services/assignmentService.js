@@ -15,16 +15,20 @@ import { db } from "../../../services/firebase/firebase";
 export async function addAssignment(uid, data) {
   const { title, description, dueDate, priority } = data;
 
+  // validate due date before saving
   if (!(dueDate instanceof Date) || Number.isNaN(dueDate.getTime())) {
-    throw Object.assign(new Error("Invalid due date."), { code: "invalid-due-date" });
+    throw Object.assign(new Error("Invalid due date."), {
+      code: "invalid-due-date",
+    });
   }
 
   const colRef = collection(db, "users", uid, "assignments");
 
+  // create new assignment doc
   const docRef = await addDoc(colRef, {
     title: title.trim(),
     description: description?.trim() ?? "",
-    priority: priority, 
+    priority: priority,
     status: "pending",
     dueDate: Timestamp.fromDate(dueDate),
     createdAt: serverTimestamp(),
@@ -36,8 +40,9 @@ export async function addAssignment(uid, data) {
 
 export function listenAssignments(uid, onChange, onError) {
   const colRef = collection(db, "users", uid, "assignments");
-  const q = query(colRef, orderBy("dueDate", "asc"));
+  const q = query(colRef, orderBy("dueDate", "asc")); // sort assignments by due date
 
+  // real-time listener
   const unsub = onSnapshot(
     q,
     (snap) => {
@@ -52,7 +57,10 @@ export function listenAssignments(uid, onChange, onError) {
 
 export async function toggleAssignmentStatus(uid, assignmentId, currentStatus) {
   const ref = doc(db, "users", uid, "assignments", assignmentId);
-  const nextStatus = currentStatus === "completed" ? "pending" : "completed";
+
+  // flip between completed <-> pending
+  const nextStatus =
+    currentStatus === "completed" ? "pending" : "completed";
 
   await updateDoc(ref, {
     status: nextStatus,
@@ -64,5 +72,7 @@ export async function toggleAssignmentStatus(uid, assignmentId, currentStatus) {
 
 export async function deleteAssignment(uid, assignmentId) {
   const ref = doc(db, "users", uid, "assignments", assignmentId);
+
+  // remove assignment document
   await deleteDoc(ref);
 }
