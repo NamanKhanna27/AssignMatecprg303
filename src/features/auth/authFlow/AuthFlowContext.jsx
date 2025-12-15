@@ -3,7 +3,7 @@ import React, { createContext, useContext, useMemo, useState } from "react";
 const AuthFlowContext = createContext(null);
 
 export function AuthFlowProvider({ children }) {
-  const [lockAuthFlow, setLockAuthFlow] = useState(false);
+  const [lockAuthFlow, setLockAuthFlow] = useState(false); // controls whether auth flow is locked
 
   const value = useMemo(
     () => ({ lockAuthFlow, setLockAuthFlow }),
@@ -16,5 +16,5 @@ export function AuthFlowProvider({ children }) {
 export function useAuthFlow() {
   const ctx = useContext(AuthFlowContext);
   if (!ctx) throw new Error("useAuthFlow must be used inside <AuthFlowProvider />");
-  return ctx;
+  return ctx; // gives access to lockAuthFlow + setter
 }
