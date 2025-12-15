@@ -7,6 +7,7 @@ import { AppDialogProvider } from "../shared/components/AppDialog/AppDialogConte
 
 export default function AppProviders() {
   return (
+    // provides lockAuthFlow state across the app
     <AuthFlowProvider>
       <AppDialogProvider>
         <NavigationContainer>
