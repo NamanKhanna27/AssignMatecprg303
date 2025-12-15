@@ -23,7 +23,7 @@ export default function SignupScreen({ navigation }) {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
-  const [name, setName] = useState("");                   // -------------------
+  const [name, setName] = useState("");              
 
   const { setLockAuthFlow } = useAuthFlow();
   const { showDialog } = useAppDialog();
