@@ -15,8 +15,9 @@ export default function LoginScreen({ navigation }) {
   const { showDialog } = useAppDialog();
 
   const handleLogin = async () => {
-    const cleanEmail = normalizeEmail(email);
+    const cleanEmail = normalizeEmail(email);  // clean + lowercase email
 
+    // check empty fields
     if (!cleanEmail || !password) {
       showDialog({
         title: "Missing information",
@@ -26,6 +27,7 @@ export default function LoginScreen({ navigation }) {
       return;
     }
 
+    // basic email format check
     if (!isValidEmail(cleanEmail)) {
       showDialog({
         title: "Invalid email",
@@ -37,10 +39,11 @@ export default function LoginScreen({ navigation }) {
 
     try {
       setLoading(true);
-      await signInWithEmailAndPassword(auth, cleanEmail, password);
+      await signInWithEmailAndPassword(auth, cleanEmail, password);  // Firebase login
     } catch (err) {
       const code = err?.code || "unknown";
 
+      // common login failures grouped together
       if (
         code === "auth/invalid-credential" ||
         code === "auth/user-not-found" ||
@@ -54,6 +57,7 @@ export default function LoginScreen({ navigation }) {
         return;
       }
 
+      // fallback to detailed error mapping
       showDialog({
         title: "Login failed",
         message: getAuthErrorMessage(code),
@@ -107,7 +111,13 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, justifyContent: "center", backgroundColor: "#fff" },
   title: { fontSize: 32, fontWeight: "bold", textAlign: "center", marginBottom: 30 },
   input: { borderWidth: 1, padding: 12, borderRadius: 10, marginBottom: 15, borderColor: "#ccc" },
-  loginBtn: { backgroundColor: "#4f46e5", padding: 15, borderRadius: 10, alignItems: "center", marginBottom: 15 },
+  loginBtn: {
+    backgroundColor: "#4f46e5",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginBottom: 15,
+  },
   loginText: { color: "#fff", fontSize: 18, fontWeight: "600" },
   link: { textAlign: "center", color: "#4f46e5" },
 });
